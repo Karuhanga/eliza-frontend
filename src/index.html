@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="nunito.css" rel="stylesheet">
+    <script src="lodash.js"></script>
+    <!-- load MUI -->
+    <link href="materialize.min.css" rel="stylesheet" type="text/css" />
+    <link href="bulma.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="index.css">
+    <script src="vue.js"></script>
+    <script src="axios.min.js"></script>
+    <!--toast-->
+    <link rel="stylesheet" type="text/css" href="mdtoast.min.css">
+    <script type="text/javascript" src="mdtoast.min.js"></script>
+    <!--end-->
+    <script src="constants.js"></script>
+    <script src="utils.js"></script>
+    <script src="index.js"></script>
+    <title>Eliza</title>
+</head>
+<body>
+    <section id="app" class="hero">
+        <div class="hero-body">
+            <ul class="container">
+                <li class="columns" v-for="message in messageQueue">
+                    <span class="column is-offset-2 is-3" v-if="message.from===ELIZA">{{message.body}}</span>
+                    <span class="column is-offset-5 is-3 has-text-right" v-if="message.from!==ELIZA">{{message.body}}</span>
+                </li>
+            </ul>
+            <form class="container" @submit.prevent="onTextReady">
+                <div class="columns align-center">
+                <span class="column is-offset-2 is-6">
+                    <input v-model="text" class="has-text-right" type="text" placeholder="Ask me anything!">
+                </span>
+                    <span class="column is-narrow">
+                    <button type="submit" :class="`btn btn-small ${isEmpty(text) ? 'disabled' : ''}`">
+                    <span v-if="!loading">Send</span>
+                    <i v-if="loading" class="spinner-blue"></i>
+                </button>
+                </span>
+                </div>
+            </form>
+        </div>
+    </section>
+</body>
+</html>
