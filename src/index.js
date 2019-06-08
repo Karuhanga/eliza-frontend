@@ -2,7 +2,7 @@ const DEBUG = true;
 let a;
 
 const instance = axios.create({
-    baseURL: 'localhost:5000/api/actions',
+    baseURL: 'http://127.0.0.1:8000/api/actions',
     timeout: 1000,
 });
 
@@ -31,19 +31,19 @@ function init() {
         methods: {
             onTextReady: () => {
                 // todo send request, get response and id
-                a.messageQueue.push(buildMessage(ME, a.text));
+                const message = buildMessage(ME, a.text);
+                a.messageQueue.push(message);
                 switch (a.stepNumber) {
-                    case 1: a.doFirstStepAction(); break;
-                    case 2: a.doSecondStepAction(); break;
-                    default: a.doFirstStepAction(); break;
+                    case 1: a.doFirstStepAction(message); break;
+                    case 2: a.doSecondStepAction(message); break;
+                    default: log('default');
                 }
             },
-            doFirstStepAction: async () => {
+            doFirstStepAction: async (myMessage) => {
                 try {
-                    const result = await instance.post('', a.message);
-                    const {message, nextStepNumber, activeActionId} = result.data;
-                    a.messageQueue.push(message);
-                    a.text = '';
+                    const result = await instance.post('/1', {message: myMessage});
+                    const {message: messageBody, nextStepNumber, activeActionId} = result.data;
+                    a.messageQueue.push(buildMessage(ELIZA, messageBody));
                     if (nextStepNumber === 2) {
                         a.stepNumber = nextStepNumber;
                         a.activeActionId = activeActionId;
@@ -51,23 +51,30 @@ function init() {
                         a.activeActionId = 0;
                     }
                 } catch (e) {
-                    a.messageQueue.pop();
-                    mdtoast('Please retry', { duration: 3000, type: mdtoast.INFO });
+                    log(e);
+                    if (e && e.response && e.response.data && e.response.data.message) {
+                        a.messageQueue.push(buildMessage(ELIZA, e.response.data.message));
+                    }
+                } finally {
+                    a.text = '';
                 }
             },
-            doSecondStepAction: async () => {
+            doSecondStepAction: async (myMessage) => {
                 try {
-                    const result = await instance.post(`?activeActionId=${a.activeActionId}&stepNumber=${a.stepNumber}`, a.message);
-                    const {message, nextStepNumber} = result.data;
-                    a.messageQueue.push(message);
-                    a.text = '';
+                    const result = await instance.post('/2', {message: myMessage, activeActionId: a.activeActionId});
+                    const {message: messageBody, nextStepNumber} = result.data;
+                    a.messageQueue.push(buildMessage(ELIZA, messageBody));
                     if (nextStepNumber === 1) {
                         a.stepNumber = nextStepNumber;
                         a.activeActionId = 0;
                     }
                 } catch (e) {
-                    a.messageQueue.pop();
-                    mdtoast('Please retry', { duration: 3000, type: mdtoast.INFO });
+                    log(e);
+                    if (e && e.response && e.response.data && e.response.data.message) {
+                        a.messageQueue.push(buildMessage(ELIZA, e.response.data.message));
+                    }
+                } finally {
+                    a.text = '';
                 }
             },
             isEmpty: (text) => {
