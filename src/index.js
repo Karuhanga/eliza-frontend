@@ -6,6 +6,10 @@ const instance = axios.create({
     baseURL: `http://${HOST}/api`,
     timeout: 20000,
 });
+const APPS = 'apps';
+const DEFAULT_APPS = 'defaultApps';
+const SEARCH_AND_INDEX = 'searchAndIndex';
+const HOME = 'home';
 
 function log(message) {
     if (DEBUG) {
@@ -47,6 +51,11 @@ function init() {
             text: '',
             listening: false,
             historyIndex: 0,
+            viewing: 'home',
+            apps: [],
+            addAppVisible: false,
+            appName: '',
+            appCommand: '',
         },
         watch: {
           messageQueue: () => {
@@ -162,8 +171,56 @@ function init() {
                     }
                 }
             },
+            switchTab: async (newTab) => {
+                a.viewing = newTab;
+                if (newTab === APPS){
+                    if (!a.apps.length) {
+                        try {
+                            const response = await instance.get('/apps');
+                            a.apps = response.data;
+                        } catch (e) {
+                            log(e);
+                        }
+                    }
+                }
+            },
+            addApp: async () => {
+                if (a.addAppVisible) {
+                    try {
+                        let response = await instance.post('/apps', {name: a.appName, command: a.appCommand});
+                        a.appName = '';
+                        a.appCommand = '';
+                        a.addAppVisible = false;
+                        response = await instance.get('/apps');
+                        a.apps = response.data;
+                    } catch (e) {
+                        log(e);
+                    }
+                } else {
+                    a.addAppVisible = true;
+                }
+
+            },
         }
     });
+
+    let hash = location.hash;
+    if (_.includes(hash, '#')){
+        hash = hash.substr(1);
+    } else {
+        hash = ''
+    }
+
+    switch (hash) {
+        case APPS:
+            a.switchTab(APPS); break;
+        case DEFAULT_APPS:
+            a.switchTab(DEFAULT_APPS); break;
+        case SEARCH_AND_INDEX:
+            a.switchTab(SEARCH_AND_INDEX); break;
+        default:
+            a.switchTab(HOME);
+    }
 }
 
 window.addEventListener("load", function(){

@@ -22,33 +22,42 @@
     <title>Eliza</title>
 </head>
 <body>
-    <section id="app" class="hero">
-        <div class="hero-head">
-            <!--<img class="image is-3by2" src="logo.gif" alt="Eliza">-->
-        </div>
-        <div class="hero-body">
-            <ul class="container">
-                <li class="columns" v-for="message in messageQueue">
-                    <span class="column is-offset-3 is-3" v-if="message.from===ELIZA">{{message.body}}</span>
-                    <span class="column is-offset-6 is-3 has-text-right" v-if="message.from!==ELIZA">{{message.body}}</span>
-                </li>
-                <li class="columns">
+    <div id="app">
+        <aside class="menu">
+            <p class="menu-label">
+                Eliza
+            </p>
+            <ul class="menu-list">
+                <li @click="switchTab('home')" :class="viewing==='home' ? 'teal lighten-5' : ''"><a href="#home">Home</a></li>
+                <li @click="switchTab('apps')" :class="viewing==='apps' ? 'teal lighten-5' : ''"><a href="#apps">Apps</a></li>
+                <li @click="switchTab('defaultApps')" :class="viewing==='defaultApps' ? 'teal lighten-5' : ''"><a href="#defaultApps">Default Apps</a></li>
+                <li @click="switchTab('searchAndIndex')" :class="viewing==='searchAndIndex' ? 'teal lighten-5' : ''"><a href="#searchAndIndex">Search and Index</a></li>
+            </ul>
+        </aside>
+        <section class="hero">
+            <div v-if="viewing==='home'" class="hero-body">
+                <ul class="container">
+                    <li class="columns" v-for="message in messageQueue">
+                        <span class="column is-offset-3 is-3" v-if="message.from===ELIZA">{{message.body}}</span>
+                        <span class="column is-offset-6 is-3 has-text-right" v-if="message.from!==ELIZA">{{message.body}}</span>
+                    </li>
+                    <li class="columns">
                     <span class="column is-offset-3 is-3" v-if="loading">
                         <a class="btn-floating waves-effect waves-teal pulse"><i class="material-icons">bubble_chart</i></a>
                     </span>
-                </li>
-            </ul>
-            <form class="container" @submit.prevent="onTextReady">
-                <div class="columns align-center">
+                    </li>
+                </ul>
+                <form class="container" @submit.prevent="onTextReady">
+                    <div class="columns align-center">
                     <span class="column is-offset-2 is-1">
                         <a @click="listenForKeyword" :disabled="listening || loading" :class="listening ? 'pulse' : ''" class="btn-floating btn-large waves-effect waves-light">
                             <i class="material-icons">mic_none</i>
                         </a>
                     </span>
-                    <span class="column is-6">
+                        <span class="column is-6">
                         <input v-model="text" class="has-text-right" type="text" @keyDown="onKeyDown" placeholder="Ask me anything!">
                     </span>
-                    <span class="column is-narrow">
+                        <span class="column is-narrow">
                         <button type="submit" :class="`btn btn-small ${isEmpty(text) ? 'disabled' : ''}`">
                             <span :disabled="loading">
                                 Send
@@ -56,9 +65,40 @@
                             </span>
                         </button>
                     </span>
+                    </div>
+                </form>
+            </div>
+            <div v-if="viewing==='apps'" class="hero-body">
+                <div class="container">
+                    <div class="columns is-centered">
+                        <div class="column is-6">
+                            <table class="table is-hoverable">
+                                <thead>
+                                <tr>
+                                    <th>Application</th>
+                                    <th>Command</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="app in apps">
+                                        <td>{{app.name}}</td>
+                                        <td>{{app.command}}</td>
+                                    </tr>
+                                    <tr v-if="addAppVisible">
+                                        <td><input v-model="appName" type="text"></td>
+                                        <td><input v-model="appCommand" type="text"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="columns is-centered" v-if="addAppVisible">
+                        <span><label for="symlink"><input class="filled-in" id="symlink" type="checkbox" /> <span>Symlink</span></label></span>
+                    </div>
                 </div>
-            </form>
-        </div>
-    </section>
+                <a @click="addApp" :disabled="addAppVisible && (!appName || !appCommand)" class="btn-floating btn-large waves-effect waves-light fab"><i class="material-icons">{{addAppVisible ? 'send' : 'add'}}</i></a>
+            </div>
+        </section>
+    </div>
 </body>
 </html>
