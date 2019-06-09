@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <link href="nunito.css" rel="stylesheet">
     <script src="lodash.js"></script>
+    <link href="materialicons.css" rel="stylesheet">
     <!-- load MUI -->
     <link href="materialize.min.css" rel="stylesheet" type="text/css" />
     <link href="bulma.min.css" rel="stylesheet" type="text/css" />
@@ -17,28 +18,39 @@
     <script src="constants.js"></script>
     <script src="utils.js"></script>
     <script src="index.js"></script>
+    <!--<link rel="icon" type="image/gif" href="logo.gif" />-->
     <title>Eliza</title>
 </head>
 <body>
     <section id="app" class="hero">
+        <div class="hero-head">
+            <!--<img class="image is-3by2" src="logo.gif" alt="Eliza">-->
+        </div>
         <div class="hero-body">
             <ul class="container">
                 <li class="columns" v-for="message in messageQueue">
-                    <span class="column is-offset-2 is-3" v-if="message.from===ELIZA">{{message.body}}</span>
-                    <span class="column is-offset-5 is-3 has-text-right" v-if="message.from!==ELIZA">{{message.body}}</span>
+                    <span class="column is-offset-3 is-3" v-if="message.from===ELIZA">{{message.body}}</span>
+                    <span class="column is-offset-6 is-3 has-text-right" v-if="message.from!==ELIZA">{{message.body}}</span>
                 </li>
             </ul>
             <form class="container" @submit.prevent="onTextReady">
                 <div class="columns align-center">
-                <span class="column is-offset-2 is-6">
-                    <input v-model="text" class="has-text-right" type="text" placeholder="Ask me anything!">
-                </span>
+                    <span class="column is-offset-2 is-1">
+                        <a @click="listenForKeyword" :disabled="listening" :class="listening ? 'pulse' : ''" class="btn-floating btn-large waves-effect waves-light">
+                            <i class="material-icons">mic_none</i>
+                        </a>
+                    </span>
+                    <span class="column is-6">
+                        <input v-model="text" class="has-text-right" type="text" placeholder="Ask me anything!">
+                    </span>
                     <span class="column is-narrow">
-                    <button type="submit" :class="`btn btn-small ${isEmpty(text) ? 'disabled' : ''}`">
-                    <span v-if="!loading">Send</span>
-                    <i v-if="loading" class="spinner-blue"></i>
-                </button>
-                </span>
+                        <button type="submit" :class="`btn btn-small ${loading ? 'pulse' : ''} ${isEmpty(text) ? 'disabled' : ''}`">
+                            <span v-if="!loading">
+                                Send
+                                <i class="material-icons right">send</i>
+                            </span>
+                        </button>
+                    </span>
                 </div>
             </form>
         </div>
