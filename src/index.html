@@ -32,6 +32,11 @@
                     <span class="column is-offset-3 is-3" v-if="message.from===ELIZA">{{message.body}}</span>
                     <span class="column is-offset-6 is-3 has-text-right" v-if="message.from!==ELIZA">{{message.body}}</span>
                 </li>
+                <li class="columns">
+                    <span class="column is-offset-3 is-3" v-if="loading">
+                        <a class="btn-floating waves-effect waves-teal pulse"><i class="material-icons">bubble_chart</i></a>
+                    </span>
+                </li>
             </ul>
             <form class="container" @submit.prevent="onTextReady">
                 <div class="columns align-center">
@@ -44,8 +49,8 @@
                         <input v-model="text" class="has-text-right" type="text" placeholder="Ask me anything!">
                     </span>
                     <span class="column is-narrow">
-                        <button type="submit" :class="`btn btn-small ${loading ? 'pulse' : ''} ${isEmpty(text) ? 'disabled' : ''}`">
-                            <span v-if="!loading">
+                        <button type="submit" :class="`btn btn-small ${isEmpty(text) ? 'disabled' : ''}`">
+                            <span :disabled="loading">
                                 Send
                                 <i class="material-icons right">send</i>
                             </span>

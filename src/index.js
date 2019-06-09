@@ -4,7 +4,7 @@ let a;
 const HOST = '127.0.0.1:8000';
 const instance = axios.create({
     baseURL: `http://${HOST}/api`,
-    timeout: 1000,
+    timeout: 20000,
 });
 
 function log(message) {
@@ -51,26 +51,28 @@ function init() {
 
         },
         methods: {
-            onTextReady: () => {
+            onTextReady: async () => {
                 if (!a.text) {
                     return
                 }
-                this.loading = true;
+                a.loading = true;
                 try {
                     const message = buildMessage(ME, a.text);
                     a.messageQueue.push(message);
+                    a.text = "";
                     switch (a.stepNumber) {
-                        case 1: a.doFirstStepAction(message); break;
-                        case 2: a.doSecondStepAction(message); break;
+                        case 1: await a.doFirstStepAction(message); break;
+                        case 2: await a.doSecondStepAction(message); break;
                         default: log('default');
                     }
                 }
                 catch (e) {
                     log(e);
+                    a.messageQueue.push(buildMessage(ELIZA, "Didn't get that."));
                     log("resetting...");
                     a.reset();
                 } finally {
-                    this.loading = false;
+                    a.loading = false;
                 }
             },
             doFirstStepAction: async (myMessage) => {
@@ -88,6 +90,9 @@ function init() {
                     log(e);
                     if (e && e.response && e.response.data && e.response.data.message) {
                         a.messageQueue.push(buildMessage(ELIZA, e.response.data.message));
+                    }
+                    else {
+                        a.messageQueue.push(buildMessage(ELIZA, "Didn't get that."));
                     }
                 } finally {
                     a.text = '';
