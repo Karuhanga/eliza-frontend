@@ -41,12 +41,12 @@
             <form class="container" @submit.prevent="onTextReady">
                 <div class="columns align-center">
                     <span class="column is-offset-2 is-1">
-                        <a @click="listenForKeyword" :disabled="listening" :class="listening ? 'pulse' : ''" class="btn-floating btn-large waves-effect waves-light">
+                        <a @click="listenForKeyword" :disabled="listening || loading" :class="listening ? 'pulse' : ''" class="btn-floating btn-large waves-effect waves-light">
                             <i class="material-icons">mic_none</i>
                         </a>
                     </span>
                     <span class="column is-6">
-                        <input v-model="text" class="has-text-right" type="text" placeholder="Ask me anything!">
+                        <input v-model="text" class="has-text-right" type="text" @keyDown="onKeyDown" placeholder="Ask me anything!">
                     </span>
                     <span class="column is-narrow">
                         <button type="submit" :class="`btn btn-small ${isEmpty(text) ? 'disabled' : ''}`">

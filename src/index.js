@@ -46,13 +46,19 @@ function init() {
             stepNumber: 1,
             text: '',
             listening: false,
+            historyIndex: 0,
+        },
+        watch: {
+          messageQueue: () => {
+              a.historyIndex = a.messageQueue.length - 1
+          }
         },
         computed: {
 
         },
         methods: {
             onTextReady: async () => {
-                if (!a.text) {
+                if (!a.text || a.loading || a.listening) {
                     return
                 }
                 a.loading = true;
@@ -137,6 +143,24 @@ function init() {
                 a.listening = true;
                 listenForKeyword();
                 // setTimeout(() => a.listening = false, 20000);
+            },
+            onKeyDown: (e) => {
+                if (a.loading || a.listening) {
+                    return
+                }
+                e = e || window.event;
+                if (e.which === 38) {
+                    if (a.messageQueue.length) {
+                        if (a.historyIndex <= 0) {
+                            a.historyIndex = a.messageQueue.length - 2;
+                        } else {
+                            a.historyIndex -= 2;
+                        }
+                        if (a.messageQueue[a.historyIndex]) {
+                            a.text = a.messageQueue[a.historyIndex].body;
+                        }
+                    }
+                }
             },
         }
     });
