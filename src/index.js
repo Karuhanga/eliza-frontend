@@ -10,11 +10,39 @@ const APPS = 'apps';
 const DEFAULT_APPS = 'defaultApps';
 const SEARCH_AND_INDEX = 'searchAndIndex';
 const HOME = 'home';
+const SETTINGS = 'settings';
+const ABOUT = 'about';
 
 function log(message) {
     if (DEBUG) {
         console.log(message);
     }
+}
+
+function getStartPage() {
+    let hash = location.hash;
+    if (_.includes(hash, '#')){
+        hash = hash.substr(1);
+    } else {
+        hash = HOME;
+    }
+
+    return hash;
+
+    // switch (hash) {
+    //     case APPS:
+    //         a.switchTab(APPS); break;
+    //     case DEFAULT_APPS:
+    //         a.switchTab(DEFAULT_APPS); break;
+    //     case SEARCH_AND_INDEX:
+    //         a.switchTab(SEARCH_AND_INDEX); break;
+    //     case SETTINGS:
+    //         a.switchTab(SETTINGS); break;
+    //     case PRIVACY:
+    //         a.switchTab(PRIVACY); break;
+    //     default:
+    //         a.switchTab(HOME);
+    // }
 }
 
 function setupSocket(onMessageReady) {
@@ -51,11 +79,13 @@ function init() {
             text: '',
             listening: false,
             historyIndex: 0,
-            viewing: 'home',
+            viewing: getStartPage(),
             apps: [],
             addAppVisible: false,
             appName: '',
             appCommand: '',
+            settings: [],
+            toIndex: ['Documents', 'Downloads', 'Music', 'Pictures'],
         },
         watch: {
           messageQueue: () => {
@@ -201,26 +231,24 @@ function init() {
                 }
 
             },
+            triggerIndex: async () => {
+                try {
+                    const response = await instance.post('/index');
+                    mdtoast(response.data.message);
+                } catch (e) {
+                    mdtoast("Could not start indexing. Retry later");
+                }
+            },
+            deleteIndex: async () => {
+                try {
+                    const response = await instance.delete('/index');
+                    mdtoast(response.data.message);
+                } catch (e) {
+                    mdtoast("Could not update indices. Retry later");
+                }
+            },
         }
     });
-
-    let hash = location.hash;
-    if (_.includes(hash, '#')){
-        hash = hash.substr(1);
-    } else {
-        hash = ''
-    }
-
-    switch (hash) {
-        case APPS:
-            a.switchTab(APPS); break;
-        case DEFAULT_APPS:
-            a.switchTab(DEFAULT_APPS); break;
-        case SEARCH_AND_INDEX:
-            a.switchTab(SEARCH_AND_INDEX); break;
-        default:
-            a.switchTab(HOME);
-    }
 }
 
 window.addEventListener("load", function(){
