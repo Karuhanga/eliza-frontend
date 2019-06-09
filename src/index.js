@@ -231,7 +231,9 @@ function init() {
                 } else {
                     a.addAppVisible = true;
                 }
-
+            },
+            cancelAddApp: () => {
+                a.addAppVisible = false;
             },
             triggerIndex: async () => {
                 try {
@@ -257,6 +259,28 @@ function init() {
             },
         }
     });
+
+    let hash = location.hash;
+    if (_.includes(hash, '#')){
+        hash = hash.substr(1);
+    } else {
+        hash = HOME;
+    }
+
+    switch (hash) {
+        case APPS:
+            a.switchTab(APPS); break;
+        case DEFAULT_APPS:
+            a.switchTab(DEFAULT_APPS); break;
+        case SEARCH_AND_INDEX:
+            a.switchTab(SEARCH_AND_INDEX); break;
+        case SETTINGS:
+            a.switchTab(SETTINGS); break;
+        case PRIVACY:
+            a.switchTab(PRIVACY); break;
+        default:
+            a.switchTab(HOME);
+    }
 }
 
 window.addEventListener("load", function(){
