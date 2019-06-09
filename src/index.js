@@ -86,6 +86,7 @@ function init() {
             appCommand: '',
             settings: [],
             toIndex: ['Documents', 'Downloads', 'Music', 'Pictures'],
+            possibleActions: [],
         },
         watch: {
           messageQueue: () => {
@@ -101,6 +102,7 @@ function init() {
                     return
                 }
                 a.loading = true;
+                a.possibleActions = [];
                 try {
                     const message = buildMessage(ME, a.text);
                     a.messageQueue.push(message);
@@ -246,6 +248,12 @@ function init() {
                 } catch (e) {
                     mdtoast("Could not update indices. Retry later");
                 }
+            },
+            whatCanYouDo: () => {
+                a.possibleActions = ["launch", "open", "music", "play video", "search", "time", "weather"];
+            },
+            setText: (text) => {
+              a.text = text;
             },
         }
     });
