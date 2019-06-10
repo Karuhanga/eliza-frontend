@@ -114,6 +114,28 @@
                 </div>
                 <a @click="addApp" :disabled="addAppVisible && (!appName || !appCommand)" class="btn-floating btn-large waves-effect waves-light fab"><i class="material-icons">{{addAppVisible ? 'send' : 'add'}}</i></a>
             </div>
+            <div v-if="viewing==='defaultApps'" class="hero-body">
+                <div class="container">
+                    <div class="columns is-centered">
+                        <div class="column is-6">
+                            <table class="table is-hoverable">
+                                <thead>
+                                <tr>
+                                    <th>Function</th>
+                                    <th>Application</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="app in DEFAULT_APPLICATIONS">
+                                    <td>{{app.functionality}}</td>
+                                    <td>{{app.application}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div v-if="viewing==='searchAndIndex'" class="hero-body">
                 <div class="container">
                     <h1 class="title has-text-centered">Indexing</h1>

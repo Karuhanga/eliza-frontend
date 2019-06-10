@@ -87,6 +87,7 @@ function init() {
             settings: [],
             toIndex: ['Documents', 'Downloads', 'Music', 'Pictures'],
             possibleActions: [],
+            DEFAULT_APPLICATIONS,
         },
         watch: {
           messageQueue: () => {
